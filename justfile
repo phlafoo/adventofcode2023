@@ -8,8 +8,6 @@ test day part:
 bench-all:
     cargo bench -q > benchmarks.txt
 bench day part:
-    cargo bench --bench {{day}} {{part}} >> {{day}}.bench.txt
-flamegraph day part:
-    cargo flamegraph --profile flamegraph --root --package {{day}} --bin {{part}} -o flamegraphs/{{day}}--{{part}}.svg
+    cargo bench --bench {{day}} {{part}} >> benchmark-results/{{day}}.bench.txt
 dhat day part:
     cargo run --profile dhat --features dhat-heap --package {{day}} --bin {{part}}

@@ -3,7 +3,7 @@ use miette::Context;
 
 #[cfg(feature = "dhat-heap")]
 #[global_allocator]
-static ALLOC: dhat::Alloc = dhat::ALLOC;
+static ALLOC: dhat::Alloc = dhat::Alloc;
 
 fn main() -> miette::Result<()> {
     #[cfg(feature = "dhat-heap")]

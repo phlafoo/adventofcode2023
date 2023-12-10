@@ -1,0 +1,25 @@
+
+running 11 tests
+iiiiiiiiiii
+test result: ok. 0 passed; 0 failed; 11 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+day_01             fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1           84.89 µs      │ 124.3 µs      │ 85.89 µs      │ 86.51 µs      │ 100     │ 100
+├─ part2           629 µs        │ 868.1 µs      │ 641.8 µs      │ 655.8 µs      │ 100     │ 100
+╰─ part2_biscardi  101.9 µs      │ 111.5 µs      │ 102.2 µs      │ 102.6 µs      │ 100     │ 100
+

@@ -9,6 +9,7 @@ dhat = "0.3.2"
 miette = "5.10.0"
 thiserror = "1.0.50"
 divan = "0.1.5"
+rstest = "0.18.2"
 
 [profile.flamegraph]
 inherits = "release"
