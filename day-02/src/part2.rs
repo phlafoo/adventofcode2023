@@ -1,6 +1,5 @@
 use crate::custom_error::AocError;
 
-// 12 red cubes, 13 green cubes, and 14 blue cubes
 pub fn process(input: &str) -> miette::Result<String, AocError> {
     let result = input.lines().map(process_line).sum::<i32>();
     Ok(result.to_string())
@@ -9,30 +8,24 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
 fn process_line(line: &str) -> i32 {
     let mut curr_count = 0;
 
-    // limits defined in problem
-    let red_limit = 12;
-    let green_limit = 13;
-    let blue_limit = 14;
+    let mut red_max = 0;
+    let mut green_max = 0;
+    let mut blue_max = 0;
 
-    let mut token_iter = line.split_whitespace().skip(1);
-    let game_num = token_iter.next().unwrap().split(':').next().unwrap();
-
-    for token in token_iter {
+    for token in line.split_whitespace().skip(2) {
         match token.parse::<i32>() {
             Ok(num) => curr_count = num,
             _ => {
-                if match &token[..1] {
-                    "r" => curr_count > red_limit,
-                    "g" => curr_count > green_limit,
-                    "b" => curr_count > blue_limit,
+                match &token[..1] {
+                    "r" => red_max = red_max.max(curr_count),
+                    "g" => green_max = green_max.max(curr_count),
+                    "b" => blue_max = blue_max.max(curr_count),
                     c => panic!("unexpected token {c}"),
-                } {
-                    return 0;
                 }
             }
         }
     }
-    game_num.parse::<i32>().unwrap()
+    red_max * green_max * blue_max
 }
 
 #[cfg(test)]
