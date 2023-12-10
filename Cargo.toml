@@ -6,14 +6,12 @@ members = ["day-*"]
 
 [workspace.dependencies]
 dhat = "0.3.2"
-miette = "5.10.0"
-thiserror = "1.0.50"
 divan = "0.1.5"
+itertools = "0.12.0"
+miette = "5.10.0"
 rstest = "0.18.2"
-
-[profile.flamegraph]
-inherits = "release"
-debug = true
+test-log = "0.2.14"
+thiserror = "1.0.50"
 
 [profile.dhat]
 inherits = "release"

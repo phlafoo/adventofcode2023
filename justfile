@@ -11,3 +11,6 @@ bench day part:
     cargo bench --bench {{day}} {{part}} >> benchmark-results/{{day}}.bench.txt
 dhat day part:
     cargo run --profile dhat --features dhat-heap --package {{day}} --bin {{part}}
+# create the directory for a new day's puzzle and fetch the input
+create day:
+    cargo generate --path ./daily-template --name {{day}}
