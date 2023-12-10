@@ -7,7 +7,7 @@ static ALLOC: dhat::Alloc = dhat::Alloc;
 
 fn main() -> miette::Result<()> {
     #[cfg(feature = "dhat-heap")]
-    let profiler = dhat::Profiler::new_heap();
+    let _profiler = dhat::Profiler::new_heap();
 
     let file = include_str!("../../input1.txt");
     let result = process(file).context("process part 1")?;
