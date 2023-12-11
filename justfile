@@ -6,9 +6,9 @@ lint day:
 test day part:
     cargo nextest run -p {{day}} {{part}}
 bench-all:
-    cargo bench -q > benchmarks.txt
+    cargo bench -q > benchmark-results/bench-all.txt
 bench day part:
-    cargo bench --bench {{day}} {{part}} >> benchmark-results/{{day}}.bench.txt
+    cargo bench --bench {{day}}-bench {{part}} >> benchmark-results/{{day}}.bench.txt
 dhat day part:
     cargo run --profile dhat --features dhat-heap --package {{day}} --bin {{part}}
 # create the directory for a new day's puzzle and fetch the input

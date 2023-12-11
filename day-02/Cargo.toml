@@ -15,7 +15,7 @@ rstest = { workspace = true }
 divan = { workspace = true }
 
 [[bench]]
-name = "day-02"
+name = "day-02-bench"
 path = "benches/benchmarks.rs"
 harness = false
 
