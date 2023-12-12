@@ -9,7 +9,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         // check left
         for (index, c) in input[..symbol_index].chars().rev().chain(".".chars()).enumerate() {
             match c {
-                n if n.is_numeric() => continue,
+                n if n.is_ascii_digit() => continue,
                 _ => {
                     total += input[symbol_index - index..symbol_index].parse::<i32>().unwrap_or(0);
                     break;
@@ -20,7 +20,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         // check right
         for (index, c) in input[symbol_index + 1..].chars().chain(".".chars()).enumerate() {
             match c {
-                n if n.is_numeric() => continue,
+                n if n.is_ascii_digit() => continue,
                 _ => {
                     total += input[symbol_index + 1..index + symbol_index + 1].parse::<i32>().unwrap_or(0);
                     break;
@@ -34,12 +34,12 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         }
         'outer: for (index_left, c) in input[..symbol_index - row_length].chars().rev().chain(".".chars()).enumerate() {
             match c {
-                n if n.is_numeric() => continue,
+                n if n.is_ascii_digit() => continue,
                 _ => {
                     // Once a non-number is found, start moving right starting at above the symbol (middle)
                     for (index_right, c) in input[symbol_index - row_length..].chars().enumerate() {
                         match c {
-                            n if n.is_numeric() => continue,
+                            n if n.is_ascii_digit() => continue,
                             _ => {
                                 // after checking top left and top middle, we have (at most) 1 number to add
                                 total += input[symbol_index - row_length - index_left..symbol_index - row_length + index_right].parse::<i32>().unwrap_or(0);
@@ -47,7 +47,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
                                 if index_right < 2 {
                                     for (index_right, c) in input[symbol_index - row_length + 1..].chars().enumerate() {
                                         match c {
-                                            n if n.is_numeric() => continue,
+                                            n if n.is_ascii_digit() => continue,
                                             _ => {
                                                 total += input[symbol_index - row_length + 1..index_right + symbol_index - row_length + 1].parse::<i32>().unwrap_or(0);
                                                 break 'outer;
@@ -69,12 +69,12 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         }
         'outer: for (index_left, c) in input[..symbol_index + row_length].chars().rev().enumerate() {
             match c {
-                n if n.is_numeric() => continue,
+                n if n.is_ascii_digit() => continue,
                 _ => {
                     // Once a non-number is found, start moving right starting at below the symbol (middle)
                     for (index_right, c) in input[symbol_index + row_length..].chars().chain(".".chars()).enumerate() {
                         match c {
-                            n if n.is_numeric() => continue,
+                            n if n.is_ascii_digit() => continue,
                             _ => {
                                 // after checking bottom left and bottom middle, we have (at most) 1 number to add
                                 total += input[symbol_index + row_length - index_left..symbol_index + row_length + index_right].parse::<i32>().unwrap_or(0);
@@ -82,7 +82,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
                                 if index_right < 2 {
                                     for (index_right, c) in input[symbol_index + row_length + 1..].chars().chain(".".chars()).enumerate() {
                                         match c {
-                                            n if n.is_numeric() => continue,
+                                            n if n.is_ascii_digit() => continue,
                                             _ => {
                                                 total += input[symbol_index + row_length + 1..index_right + symbol_index + row_length + 1].parse::<i32>().unwrap_or(0);
                                                 break 'outer;
@@ -104,7 +104,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
 fn is_symbol(c: char) -> bool {
     match c {
         '.' | '\n' | '\r' => false,
-        n if n.is_numeric() => false,
+        n if n.is_ascii_digit() => false,
         _ => true,
     }
 }
