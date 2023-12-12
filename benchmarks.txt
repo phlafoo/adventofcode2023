@@ -1,14 +1,14 @@
 ** PC specs: Laptop AMD Ryzen 9 5900HX, 16 GB RAM **
 
-day_01_bench       fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1           88.59 µs      │ 219.7 µs      │ 89.69 µs      │ 96.6 µs       │ 100     │ 100
-├─ part2           398.4 µs      │ 473.4 µs      │ 403.9 µs      │ 408.2 µs      │ 100     │ 100
-╰─ part2_biscardi  113.8 µs      │ 207.9 µs      │ 114.5 µs      │ 119.2 µs      │ 100     │ 100
+day_01_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1            88.59 µs      │ 219.7 µs      │ 89.69 µs      │ 96.6 µs       │ 100     │ 100
+├─ part2            398.4 µs      │ 473.4 µs      │ 403.9 µs      │ 408.2 µs      │ 100     │ 100
+╰─ part2_biscardi   113.8 µs      │ 207.9 µs      │ 114.5 µs      │ 119.2 µs      │ 100     │ 100
 
-day_02_bench  fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1      19.69 µs      │ 34.69 µs      │ 19.79 µs      │ 20.07 µs      │ 100     │ 100
-╰─ part2      29.59 µs      │ 35.69 µs      │ 29.79 µs      │ 29.96 µs      │ 100     │ 100
+day_02_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1            19.69 µs      │ 34.69 µs      │ 19.79 µs      │ 20.07 µs      │ 100     │ 100
+╰─ part2            29.59 µs      │ 35.69 µs      │ 29.79 µs      │ 29.96 µs      │ 100     │ 100
 
-day_03_bench  fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1      48.49 µs      │ 71.29 µs      │ 49.09 µs      │ 49.99 µs      │ 100     │ 100
-╰─ part2      
+day_03_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1            48.49 µs      │ 71.29 µs      │ 49.09 µs      │ 49.99 µs      │ 100     │ 100
+╰─ part2            15.79 µs      │ 30.19 µs      │ 15.99 µs      │ 16.42 µs      │ 100     │ 100
