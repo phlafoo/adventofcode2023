@@ -160,6 +160,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "day-05"
+version = "0.1.0"
+dependencies = [
+ "dhat",
+ "divan",
+ "itertools",
+ "miette",
+ "optick",
+ "rstest",
+ "test-log",
+ "thiserror",
+]
+
+[[package]]
 name = "dhat"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -441,6 +455,12 @@ name = "once_cell"
 version = "1.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3fdb12b2476b595f9358c5161aa467c2438859caa136dec86c26fdd2efe17b92"
+
+[[package]]
+name = "optick"
+version = "1.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7e7ab6068cdba9928db83674b18fe7aa2efbaa9920698d260ecbaf7906c6548"
 
 [[package]]
 name = "parking_lot"
