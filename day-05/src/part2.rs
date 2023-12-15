@@ -134,7 +134,7 @@ pub fn process_optimized(input: &str) -> miette::Result<String, AocError> {
 
     let mut ranges = vec![];
 
-    // Iterate over seed ranges
+    // Iterate over seed ranges and save in `ranges`
     while seed_line_values.peek().is_some() {
         let range_start = seed_line_values.next().unwrap().parse::<i64>().unwrap();
         let range_length = seed_line_values.next().unwrap().parse::<i64>().unwrap();
@@ -146,11 +146,21 @@ pub fn process_optimized(input: &str) -> miette::Result<String, AocError> {
 
     for mapping in mappings.iter() {
         for rule in mapping.iter() {
+            // Getting ranges.len() here and doing `while range_index < ranges_len` instead of `loop`
+            // does slightly reduce number of iterations but the performance is slightly worse...
             loop {
-                let Some(input_range) = ranges.get(range_index).cloned() else {
+                let Some(input_range) = ranges.get(range_index) else {
                     range_index = 0;
                     break;
                 };
+                
+                // Grabbing the variables in this way gives ~5-10% performance improvement
+                let input_start = input_range.start;
+                let input_end = input_range.end;
+                let rule_start = &rule.start;
+                let rule_end = &rule.end;
+                let offset = &rule.offset;
+                
                 // ## Cases Legend
                 // input  {}
                 // rule   []
@@ -162,33 +172,37 @@ pub fn process_optimized(input: &str) -> miette::Result<String, AocError> {
                 // case 6: {[]} => {[ , m[], ]} (replace input and push)
 
                 // case 1 and 2
-                if input_range.start >= rule.end || input_range.end <= rule.start {
+                if input_start >= *rule_end || input_end <= *rule_start {
                     range_index += 1;
                     continue;
                 }
 
-                match (input_range.start >= rule.start, input_range.end <= rule.end) {
+                match (input_start >= *rule_start, input_end <= *rule_end) {
                     (true, true) => {
                         // case 3
                         ranges.swap_remove(range_index);
                         mapped_ranges
-                            .push(input_range.start + rule.offset..input_range.end + rule.offset);
+                            .push(input_start + offset..input_end + offset);
                     }
                     (true, false) => {
                         // case 4
-                        mapped_ranges.push(input_range.start + rule.offset..rule.end + rule.offset);
-                        ranges[range_index] = rule.end..input_range.end;
+                        mapped_ranges.push(input_start + offset..rule_end + offset);
+                        ranges[range_index] = *rule_end..input_end;
+                        // Incrementing range_index for case 4 and 5 reduces redundant range checks
+                        // but for some reason the performance is slightly worse
+                        // range_index += 1;
                     }
                     (false, true) => {
                         // case 5
-                        ranges[range_index] = input_range.start..rule.start;
-                        mapped_ranges.push(rule.start + rule.offset..input_range.end + rule.offset);
+                        ranges[range_index] = input_start..*rule_start;
+                        mapped_ranges.push(rule_start + offset..input_end + offset);
+                        // range_index += 1;
                     }
                     (false, false) => {
                         // case 6
-                        ranges[range_index] = input_range.start..rule.start;
-                        mapped_ranges.push(rule.start + rule.offset..rule.end + rule.offset);
-                        ranges.push(rule.end..input_range.end);
+                        ranges[range_index] = input_start..*rule_start;
+                        mapped_ranges.push(rule_start + offset..rule_end + offset);
+                        ranges.push(*rule_end..input_end);
                         range_index += 1;
                     }
                 }
