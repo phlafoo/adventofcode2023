@@ -1,12 +1,15 @@
 use crate::custom_error::AocError;
-struct Mapping {
-    source_range: std::ops::Range<i64>,
+
+#[derive(Debug)]
+struct Rule {
+    start: i64,
+    end: i64,
     offset: i64,
 }
 
-impl Mapping {
+impl Rule {
     fn map(&self, x: &mut i64) -> bool {
-        if self.source_range.contains(x) {
+        if (self.start..self.end).contains(x) {
             *x += self.offset;
             return true;
         }
@@ -16,7 +19,78 @@ impl Mapping {
 
 pub fn process(input: &str) -> miette::Result<String, AocError> {
     // There are 7 mapping steps. For each step I will store the list of mappings that may apply.
-    let mut mappings_collection: [Vec<Mapping>; 7] = std::array::from_fn(|_| vec![]);
+    let mut mappings: [Vec<Rule>; 7] = std::array::from_fn(|_| vec![]);
+    let mut mapping_index = 0;
+
+    let mut lines = input.lines();
+
+    // Get values that define seed ranges
+    let mut seed_line_values = lines
+        .next()
+        .unwrap()
+        .split_ascii_whitespace()
+        .skip(1)
+        .peekable();
+
+    // Start at first mapping line
+    lines.next();
+    lines.next();
+
+    // Collect all mappings
+    while let Some(line) = lines.next() {
+        // Skip to next mapping line if empty
+        if line.is_empty() {
+            lines.next();
+            mapping_index += 1;
+            continue;
+        }
+        // Grab values from mapping line
+        let mut value_iter = line
+            .split_ascii_whitespace()
+            .map(|value| value.parse::<i64>().unwrap());
+
+        let dest_start = value_iter.next().unwrap();
+        let source_start = value_iter.next().unwrap();
+        let range_length = value_iter.next().unwrap();
+
+        // Save mapping for later use
+        mappings[mapping_index].push(Rule {
+            start: source_start,
+            end: source_start + range_length,
+            offset: dest_start - source_start,
+        });
+    }
+
+    let mut min = i64::MAX;
+
+    // Iterate over seed ranges
+    while seed_line_values.peek().is_some() {
+        let range_start = seed_line_values.next().unwrap().parse::<i64>().unwrap();
+        let range_length = seed_line_values.next().unwrap().parse::<i64>().unwrap();
+
+        // Maps one seed at a time...
+        for mut mapped_value in range_start..range_start + range_length {
+            for mapping in mappings.iter() {
+                for rule in mapping.iter() {
+                    if rule.map(&mut mapped_value) {
+                        break;
+                    }
+                }
+            }
+            // Update min
+            if mapped_value < min {
+                min = mapped_value;
+            }
+        }
+    }
+
+    Ok(min.to_string())
+}
+
+/// The idea here is to process per seed range instead of per seed
+pub fn process_optimized(input: &str) -> miette::Result<String, AocError> {
+    // There are 7 mapping steps. For each step I will store the list of mappings that may apply.
+    let mut mappings: [Vec<Rule>; 7] = std::array::from_fn(|_| vec![]);
     let mut mappings_index = 0;
 
     let mut lines = input.lines();
@@ -51,34 +125,80 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         let range_length = value_iter.next().unwrap();
 
         // Save mapping for later use
-        mappings_collection[mappings_index].push(Mapping {
-            source_range: (source_start..source_start + range_length),
+        mappings[mappings_index].push(Rule {
+            start: source_start,
+            end: source_start + range_length,
             offset: dest_start - source_start,
         });
     }
 
-    let mut min = i64::MAX;
+    let mut ranges = vec![];
 
     // Iterate over seed ranges
     while seed_line_values.peek().is_some() {
         let range_start = seed_line_values.next().unwrap().parse::<i64>().unwrap();
         let range_length = seed_line_values.next().unwrap().parse::<i64>().unwrap();
+        ranges.push(range_start..range_start + range_length);
+    }
 
-        // Maps one seed at a time...
-        for mut mapped_value in range_start..range_start + range_length {
-            for mappings in mappings_collection.iter() {
-                for mapping in mappings.iter() {
-                    if mapping.map(&mut mapped_value) {
-                        break;
+    let mut range_index = 0;
+    let mut mapped_ranges = vec![];
+
+    for mapping in mappings.iter() {
+        for rule in mapping.iter() {
+            loop {
+                let Some(input_range) = ranges.get(range_index).cloned() else {
+                    range_index = 0;
+                    break;
+                };
+                // ## Cases Legend
+                // input  {}
+                // rule   []
+                // case 1: {}[] => no changes
+                // case 2: []{} => no changes
+                // case 3: [{}] => m{}          (remove input)
+                // case 4: [{]} => m{], ]}      (replace input)
+                // case 5: {[}] => {[ , m[}     (replace input)
+                // case 6: {[]} => {[ , m[], ]} (replace input and push)
+
+                // case 1 and 2
+                if input_range.start >= rule.end || input_range.end <= rule.start {
+                    range_index += 1;
+                    continue;
+                }
+
+                match (input_range.start >= rule.start, input_range.end <= rule.end) {
+                    (true, true) => {
+                        // case 3
+                        ranges.swap_remove(range_index);
+                        mapped_ranges
+                            .push(input_range.start + rule.offset..input_range.end + rule.offset);
+                    }
+                    (true, false) => {
+                        // case 4
+                        mapped_ranges.push(input_range.start + rule.offset..rule.end + rule.offset);
+                        ranges[range_index] = rule.end..input_range.end;
+                    }
+                    (false, true) => {
+                        // case 5
+                        ranges[range_index] = input_range.start..rule.start;
+                        mapped_ranges.push(rule.start + rule.offset..input_range.end + rule.offset);
+                    }
+                    (false, false) => {
+                        // case 6
+                        ranges[range_index] = input_range.start..rule.start;
+                        mapped_ranges.push(rule.start + rule.offset..rule.end + rule.offset);
+                        ranges.push(rule.end..input_range.end);
+                        range_index += 1;
                     }
                 }
             }
-            // Update min
-            if mapped_value < min {
-                min = mapped_value;
-            }
         }
+        // `ranges` now contains only inputs that did not match any rule, so their values don't
+        // change for the next step.
+        ranges.append(&mut mapped_ranges);
     }
+    let min = ranges.iter().map(|r| r.start).min().unwrap();
 
     Ok(min.to_string())
 }

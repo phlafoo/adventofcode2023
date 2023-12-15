@@ -1,4 +1,4 @@
-use day_05::part2::process;
+use day_05::part2::*;
 use miette::Context;
 
 #[cfg(feature = "dhat-heap")]
@@ -11,7 +11,7 @@ fn main() -> miette::Result<()> {
 
     let file = include_str!("../../input2.txt");
 
-    let result = process(file).context("process part 2")?;
+    let result = process_optimized(file).context("process part 2")?;
     println!("{}", result);
     Ok(())
 }
