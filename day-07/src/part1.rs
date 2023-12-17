@@ -17,7 +17,7 @@ enum Category {
     FiveOfAKind,
 }
 
-// Store each hand-bid pair with corresponding category
+/// Store each hand-bid pair with corresponding category
 #[derive(Debug, Eq)]
 struct HandBid {
     hand: [u8; 5],

@@ -11,6 +11,7 @@ fn main() -> miette::Result<()> {
 
     let file = include_str!("../../input2.txt");
     let result = process(file).context("process part 2")?;
+    // 250825971
     println!("{}", result);
     Ok(())
 }
