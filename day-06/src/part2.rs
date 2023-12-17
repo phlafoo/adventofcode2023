@@ -12,7 +12,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
                 .split_ascii_whitespace()
                 .join("")
                 .parse::<u64>()
-                .unwrap()
+                .expect("should be valid u64")
         })
         .collect_tuple()
         .unwrap();
