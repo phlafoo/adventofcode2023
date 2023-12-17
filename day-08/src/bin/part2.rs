@@ -1,4 +1,4 @@
-use {{crate_name}}::part1::*;
+use day_08::part2::process;
 use miette::Context;
 
 #[cfg(feature = "dhat-heap")]
@@ -10,7 +10,7 @@ fn main() -> miette::Result<()> {
     let _profiler = dhat::Profiler::new_heap();
 
     let file = include_str!("../../input.txt");
-    let result = process(file).context("process part 1")?;
+    let result = process(file).context("process part 2")?;
     println!("{}", result);
     Ok(())
 }

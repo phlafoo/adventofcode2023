@@ -1,4 +1,4 @@
-use {{crate_name}}::part1::*;
+use day_08::part1::process;
 use miette::Context;
 
 #[cfg(feature = "dhat-heap")]
