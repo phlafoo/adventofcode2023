@@ -30,6 +30,14 @@ fn part1_optimized_dft() {
 }
 
 #[divan::bench]
+fn part1_bc() {
+    part1::process_bc(divan::black_box(include_str!(
+        "../input.txt",
+    )))
+    .unwrap();
+}
+
+#[divan::bench]
 fn part2() {
     part2::process(divan::black_box(include_str!(
         "../input.txt",
@@ -39,6 +47,14 @@ fn part2() {
 #[divan::bench]
 fn part2_dft() {
     part2::process_dft(divan::black_box(include_str!(
+        "../input.txt",
+    )))
+    .unwrap();
+}
+
+#[divan::bench]
+fn part2_bc() {
+    part2::process_bc(divan::black_box(include_str!(
         "../input.txt",
     )))
     .unwrap();

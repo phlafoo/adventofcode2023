@@ -101,6 +101,51 @@ pub fn process_optimized_dft(input: &str) -> miette::Result<String, AocError> {
     Ok(result.to_string())
 }
 
+/// Using binomial coefficients.
+/// For example for a row length of 5:
+///     prediction = a - 5b + 10c - 10d + 5e
+pub fn process_bc(input: &str) -> miette::Result<String, AocError> {
+    // Pre-computed binomial coefficients
+    let bin_coeffs = [
+        1, -21, 210, -1330, 5985, -20349, 54264, -116280, 203490, -293930, 352716, -352716, 293930,
+        -203490, 116280, -54264, 20349, -5985, 1330, -210, 21,
+    ];
+    // for test input:
+    // let bin_coeffs = [-1, 6, -15, 20, -15, 6];
+
+    // Or compute at runtime
+    // // const ROW_LEN: usize = 6; // for test input
+    // const ROW_LEN: usize = 21;
+    // let n = ROW_LEN + 1;
+
+    // let mut bin_coeffs = [0_i32; ROW_LEN];
+    // bin_coeffs[0] = 1;
+    // for k in 1..=(n / 2) {
+    //     let bn = num::integer::binomial(ROW_LEN, k) as i32;
+    //     bin_coeffs[ROW_LEN - k] = bn;
+    //     bin_coeffs[k] = bn;
+    // }
+
+    // let mut sign = if ROW_LEN % 2 == 0 { -1 } else { 1 };
+    // for bn in &mut bin_coeffs {
+    //     *bn *= sign;
+    //     sign *= -1;
+    // }
+    // println!("{:?}", bin_coeffs);
+
+    let result = input
+        .lines()
+        .map(|line| {
+            line.split_ascii_whitespace()
+                .map(|num| num.parse::<i32>().expect("valid integer string"))
+                .enumerate()
+                .fold(0, |acc, (i, v)| acc + bin_coeffs[i] * v)
+        })
+        .sum::<i32>();
+
+    Ok(result.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

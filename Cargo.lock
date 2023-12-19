@@ -220,6 +220,7 @@ dependencies = [
  "dhat",
  "divan",
  "miette",
+ "num",
  "rstest",
  "test-log",
  "thiserror",

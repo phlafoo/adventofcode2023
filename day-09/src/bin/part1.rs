@@ -10,9 +10,10 @@ fn main() -> miette::Result<()> {
     let _profiler = dhat::Profiler::new_heap();
 
     let file = include_str!("../../input.txt");
-    let result = process(file).context("process part 1")?;
+    // let result = process(file).context("process part 1")?;
     // let result = process_optimized(file).context("process part 1")?;
     // let result = process_optimized_dft(file).context("process part 1")?;
+    let result = process_bc(file).context("process part 1")?;
     // 1987402313
     println!("{}", result);
     Ok(())

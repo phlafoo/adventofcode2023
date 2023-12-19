@@ -9,6 +9,7 @@ edition = "2021"
 miette.workspace = true
 thiserror.workspace = true
 dhat.workspace = true
+num.workspace = true
 # itertools.workspace = true
 # nom.workspace = true
 # tracing.workspace = true
