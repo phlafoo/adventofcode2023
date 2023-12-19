@@ -1,5 +1,6 @@
 /target
 /.vscode
 dhat-heap.json
+scratch.txt
 /benchmark-results
 /optick

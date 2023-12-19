@@ -1,36 +1,43 @@
 ** PC specs: Laptop AMD Ryzen 9 5900HX, 16 GB RAM **
 
-day_01_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            88.59 µs      │ 219.7 µs      │ 89.69 µs      │ 96.6 µs       │ 100     │ 100
-├─ part2            398.4 µs      │ 473.4 µs      │ 403.9 µs      │ 408.2 µs      │ 100     │ 100
-╰─ part2_biscardi   113.8 µs      │ 207.9 µs      │ 114.5 µs      │ 119.2 µs      │ 100     │ 100
+day_01_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    88.59 µs      │ 219.7 µs      │ 89.69 µs      │ 96.6 µs       │ 100     │ 100
+├─ part2                    398.4 µs      │ 473.4 µs      │ 403.9 µs      │ 408.2 µs      │ 100     │ 100
+╰─ part2_biscardi           113.8 µs      │ 207.9 µs      │ 114.5 µs      │ 119.2 µs      │ 100     │ 100
 
-day_02_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            19.69 µs      │ 34.69 µs      │ 19.79 µs      │ 20.07 µs      │ 100     │ 100
-╰─ part2            29.59 µs      │ 35.69 µs      │ 29.79 µs      │ 29.96 µs      │ 100     │ 100
+day_02_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    19.69 µs      │ 34.69 µs      │ 19.79 µs      │ 20.07 µs      │ 100     │ 100
+╰─ part2                    29.59 µs      │ 35.69 µs      │ 29.79 µs      │ 29.96 µs      │ 100     │ 100
 
-day_03_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            48.49 µs      │ 71.29 µs      │ 49.09 µs      │ 49.99 µs      │ 100     │ 100
-╰─ part2            15.79 µs      │ 30.19 µs      │ 15.99 µs      │ 16.42 µs      │ 100     │ 100
+day_03_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    48.49 µs      │ 71.29 µs      │ 49.09 µs      │ 49.99 µs      │ 100     │ 100
+╰─ part2                    15.79 µs      │ 30.19 µs      │ 15.99 µs      │ 16.42 µs      │ 100     │ 100
 
-day_04_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            260.5 µs      │ 367.7 µs      │ 265.1 µs      │ 268.1 µs      │ 100     │ 100
-╰─ part2            265.5 µs      │ 316.8 µs      │ 267.5 µs      │ 268.6 µs      │ 100     │ 100
+day_04_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    260.5 µs      │ 367.7 µs      │ 265.1 µs      │ 268.1 µs      │ 100     │ 100
+╰─ part2                    265.5 µs      │ 316.8 µs      │ 267.5 µs      │ 268.6 µs      │ 100     │ 100
 
-day_05_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            140.1 µs      │ 196.7 µs      │ 143.9 µs      │ 146.3 µs      │ 100     │ 100
-├─ part1_optimized  12.79 µs      │ 31.39 µs      │ 12.89 µs      │ 13.33 µs      │ 100     │ 100
-├─ part2            1.531 m       │ 1.531 m       │ 1.531 m       │ 1.531 m       │ 1       │ 1
-╰─ part2_optimized  17.29 µs      │ 47.19 µs      │ 17.69 µs      │ 19.35 µs      │ 100     │ 100
+day_05_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    140.1 µs      │ 196.7 µs      │ 143.9 µs      │ 146.3 µs      │ 100     │ 100
+├─ part1_optimized          12.79 µs      │ 31.39 µs      │ 12.89 µs      │ 13.33 µs      │ 100     │ 100
+├─ part2                    1.531 m       │ 1.531 m       │ 1.531 m       │ 1.531 m       │ 1       │ 1
+╰─ part2_optimized          17.29 µs      │ 47.19 µs      │ 17.69 µs      │ 19.35 µs      │ 100     │ 100
 
-day_06_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            179.4 ns      │ 221.6 ns      │ 184.1 ns      │ 184 ns        │ 100     │ 6400
-╰─ part2            362.2 ns      │ 527.9 ns      │ 365.4 ns      │ 369.3 ns      │ 100     │ 3200
+day_06_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    179.4 ns      │ 221.6 ns      │ 184.1 ns      │ 184 ns        │ 100     │ 6400
+╰─ part2                    362.2 ns      │ 527.9 ns      │ 365.4 ns      │ 369.3 ns      │ 100     │ 3200
 
-day_07_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            75.79 µs      │ 151.1 µs      │ 76.49 µs      │ 80.77 µs      │ 100     │ 100
-╰─ part2            97.59 µs      │ 166.1 µs      │ 100.8 µs      │ 104.1 µs      │ 100     │ 100
+day_07_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    75.79 µs      │ 151.1 µs      │ 76.49 µs      │ 80.77 µs      │ 100     │ 100
+╰─ part2                    97.59 µs      │ 166.1 µs      │ 100.8 µs      │ 104.1 µs      │ 100     │ 100
 
-day_08_bench        fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ part1            387.6 µs      │ 472.4 µs      │ 401.3 µs      │ 403.7 µs      │ 100     │ 100
-╰─ part2            1.992 ms      │ 2.249 ms      │ 2.038 ms      │ 2.051 ms      │ 100     │ 100
+day_08_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    387.6 µs      │ 472.4 µs      │ 401.3 µs      │ 403.7 µs      │ 100     │ 100
+╰─ part2                    1.992 ms      │ 2.249 ms      │ 2.038 ms      │ 2.051 ms      │ 100     │ 100
+
+day_09_bench                fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ part1                    185.5 µs      │ 363.1 µs      │ 189.5 µs      │ 196.1 µs      │ 100     │ 100
+├─ part1_optimized          58.59 µs      │ 97.49 µs      │ 59.84 µs      │ 61.58 µs      │ 100     │ 100
+├─ part1_optimized_bft      47.49 µs      │ 58.59 µs      │ 47.99 µs      │ 48.53 µs      │ 100     │ 100
+├─ part2                    53.59 µs      │ 80.09 µs      │ 53.79 µs      │ 54.3 µs       │ 100     │ 100
+╰─ part2_bft                45.69 µs      │ 60.79 µs      │ 46.59 µs      │ 48.76 µs      │ 100     │ 100
