@@ -101,6 +101,7 @@ pub fn process_optimized(input: &str) -> miette::Result<String, AocError> {
         .unwrap()
         .split_ascii_whitespace()
         .skip(1)
+        .map(|s| s.parse::<i64>().unwrap())
         .peekable();
 
     // Start at first mapping line
@@ -136,8 +137,8 @@ pub fn process_optimized(input: &str) -> miette::Result<String, AocError> {
 
     // Iterate over seed ranges and save in `ranges`
     while seed_line_values.peek().is_some() {
-        let range_start = seed_line_values.next().unwrap().parse::<i64>().unwrap();
-        let range_length = seed_line_values.next().unwrap().parse::<i64>().unwrap();
+        let range_start = seed_line_values.next().unwrap();
+        let range_length = seed_line_values.next().unwrap();
         ranges.push(range_start..range_start + range_length);
     }
 
