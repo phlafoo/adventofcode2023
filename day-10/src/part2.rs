@@ -17,17 +17,13 @@ static PIPE_DIR_MAP: phf::Map<u8, [(i32, i32); 2]> = phf_map! {
     b'S' => [DOWN, RIGHT],
 };
 
+/// I probably could have processed the input better to reduce the amount of conditional logic.
 pub fn process(input: &str) -> miette::Result<String, AocError> {
     let row_length = (input.find('\n').unwrap() + 1) as i32;
     let start_index = input.find('S').unwrap() as i32;
 
     // indexing is easier if in bytes
     let input = input.as_bytes();
-
-    // dbg!(start_index, row_length, input.len());
-    let mut periods = [b'.'; 19878];
-    // let mut periods = [b'.'; 107];
-    // 219 block
 
     // Find first direction to go from start. Guaranteed to have 2 possible directions to go. We
     // just need to find one so we can check 2 directions and if it's not one of them then we select
@@ -36,7 +32,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
     let mut start_dir = LEFT;
     let end_dir;
     let mut start_directions = vec![];
-    
+
     // Check if 'S' is at top or bottom
     if start_index > row_length {
         start_directions.push(UP);
@@ -49,7 +45,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         if [b'.', b'\n'].contains(&pipe) {
             continue;
         }
-        // If the reverse of current direction is one of the pipe's assoc. directions => valid 
+        // If the reverse of current direction is one of the pipe's assoc. directions => valid
         // start direction
         if PIPE_DIR_MAP[&pipe].contains(&(-x, -y)) {
             start_dir = (*x, *y);
@@ -72,7 +68,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         // Move index in direction
         let (x, y) = dir;
         index = index + (row_length * y) + x;
-        
+
         // Update range based on direction
         match dir {
             UP | DOWN => {
@@ -82,13 +78,11 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
             }
             LEFT => range.start = index,
             RIGHT => range.end = index + 1,
-            _ => panic!("invalid direction")
+            _ => panic!("invalid direction"),
         }
 
         // Get next pipe segment
         let pipe = &input[index as usize];
-        
-        periods[index as usize] = *pipe;
 
         if *pipe == b'S' {
             // Back at start, need to update the original range associated with the start tile
@@ -103,8 +97,6 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
             }
             // Save end direction for later use
             end_dir = dir;
-            // dbg!(loop_mask[0].clone());
-            // dbg!(loop_mask[loop_mask.len() - 1].clone());
             break;
         }
         // get assoc. directions
@@ -118,107 +110,59 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         }
     }
 
-    // dbg!(start_dir, end_dir);
-    // for (i, c) in periods.iter().enumerate() {
-    //     if i as i32 % row_length == 0 {
-    //         println!();
-    //     }
-    //     print!("{}", *c as char);
-    // }
-    // println!();
-    // println!();
-
-    
-
-//    println!("{:?}", loop_mask.clone());
-
     let mut is_inside = false;
     let mut total = 0;
     let mut inside_left_bound = 0;
+    let start_replacement = replace_start(start_dir, end_dir);
 
     // Traverse ranges in order
     loop_ranges.sort_by(|a, b| a.start.cmp(&b.start));
     for range in &loop_ranges {
-        // println!("\x1b[93mError\x1b[0m");
-        // let row_start = r.start % row_length;
-        // for i in inside_start..r.start {
-        //     if i % row_length == 0 {
-        //         println!();
-        //         continue;
-        //     }
-        //     if is_inside {
-        //         print!("\x1b[101mx\x1b[0m");
-        //     } else {
-        //         print!(".");
-        //     }
-        // }
-       
-        // for i in r.clone() {
-            // print!("{} ", input[i as usize] as char);
-        // }
-        // println!();
+        // If we were inside, increase total
         if is_inside {
             total += range.start - inside_left_bound;
         }
+        // If we have crossed a "boundary", negate `is_inside`
         if match &input[range.start as usize] {
             b'|' => true,
             p => {
-                    // dbg!(*p as char);
-                    // dbg!(input[r.end as usize  - 1] as char);
-                    // dbg!(start_dir, end_dir);
-                if range.start == start_index {
-                    crossed_boundary(replace_start(start_dir, end_dir), input[range.end as usize - 1])
-                } else if range.end - 1 == start_index {
-                    crossed_boundary(*p, replace_start(start_dir, end_dir))
+                // Need to carefully handle when 'S' is at the beginning or end of range
+                let left = if range.start == start_index {
+                    start_replacement
                 } else {
-                    crossed_boundary(*p, input[range.end as usize - 1])
-                }
-                
-                // dbg!(*p as char);
-                // PIPE_DIR_MAP[p][0] != PIPE_DIR_MAP[&input[r.end as usize]][0]
+                    *p
+                };
+                let right = if range.end - 1 == start_index {
+                    start_replacement
+                } else {
+                    input[range.end as usize - 1]
+                };
+                crossed_boundary(left, right)
             }
         } {
             is_inside = !is_inside;
         }
+        // The current range's right bound is the left bound for the next inside section
         inside_left_bound = range.end;
-        // dbg!(do_switch, is_inside);
-        
-        // else {
-            // for i in inside_start..r.start {
-            //     if i % row_length == 0 {
-            //         println!();
-            //         // continue;
-            //     }
-            //     print!(".");
-            // }
-        // }
-        
-        // for i in r.clone() {
-        //     print!("{}", input[i as usize] as char);
-        // }
-        
-        // println!();
-        // let row = r.start / row_length;
-        // println!("{row}");
     }
-    // for i in inside_start..input.len() as i32 {
-    //     if i % row_length == 0 {
-    //         println!();
-    //         // continue;
-    //     }
-    //     print!(".");
-    // }
-    // println!();
 
-    // Furthest point will be halfway around loop
     Ok(total.to_string())
 }
 
+/// Checks if a boundary has been crossed for the following cases:
+///     L--7 => true
+///     F--7 => true
+///     L--J => false
+///     F--J => false
 #[inline]
 fn crossed_boundary(left: u8, right: u8) -> bool {
+    if left == b'|' {
+        return true;
+    }
     PIPE_DIR_MAP[&left][0] != PIPE_DIR_MAP[&right][0]
 }
 
+/// Figure out which corner pipe segment should replace the start tile
 #[inline]
 fn replace_start(start_dir: (i32, i32), end_dir: (i32, i32)) -> u8 {
     match (start_dir, end_dir) {
@@ -226,7 +170,7 @@ fn replace_start(start_dir: (i32, i32), end_dir: (i32, i32)) -> u8 {
         (UP, LEFT) | (RIGHT, DOWN) => b'L',
         (DOWN, LEFT) | (RIGHT, UP) => b'F',
         (DOWN, RIGHT) | (LEFT, UP) => b'7',
-        _ => panic!(),
+        _ => b'|',
     }
 }
 
