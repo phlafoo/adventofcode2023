@@ -7,15 +7,28 @@ const LEFT: (i32, i32) = (-1, 0);
 const RIGHT: (i32, i32) = (1, 0);
 
 // Associate pipes with directions
-static PIPE_DIR_MAP: phf::Map<u8, [(i32, i32); 2]> = phf_map! {
-    b'|' => [UP,   DOWN],
-    b'-' => [LEFT, RIGHT],
-    b'L' => [UP,   RIGHT],
-    b'J' => [UP,   LEFT],
-    b'7' => [DOWN, LEFT],
-    b'F' => [DOWN, RIGHT],
-    b'S' => [DOWN, RIGHT],
-};
+// static PIPE_DIR_MAP: phf::Map<u8, [(i32, i32); 2]> = phf_map! {
+//     b'|' => [UP,   DOWN],
+//     b'-' => [LEFT, RIGHT],
+//     b'L' => [UP,   RIGHT],
+//     b'J' => [UP,   LEFT],
+//     b'7' => [DOWN, LEFT],
+//     b'F' => [DOWN, RIGHT],
+//     b'S' => [DOWN, RIGHT],
+// };
+static PIPE_DIR_MAP: [[(i32, i32); 2]; 128] = create_pipe_dir_map();
+
+const fn create_pipe_dir_map() -> [[(i32, i32); 2]; 128] {
+    let mut map = [[(0, 0), (0, 0)]; 128];
+    map[b'|' as usize] =  [UP,   DOWN];
+    map[b'-' as usize] =  [LEFT, RIGHT];
+    map[b'L' as usize] =  [UP,   RIGHT];
+    map[b'J' as usize] =  [UP,   LEFT];
+    map[b'7' as usize] =  [DOWN, LEFT];
+    map[b'F' as usize] =  [DOWN, RIGHT];
+    map[b'S' as usize] =  [DOWN, RIGHT];
+    map
+}
 
 /// I probably could have processed the input better to reduce the amount of conditional logic.
 pub fn process(input: &str) -> miette::Result<String, AocError> {
@@ -47,7 +60,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
         }
         // If the reverse of current direction is one of the pipe's assoc. directions => valid
         // start direction
-        if PIPE_DIR_MAP[&pipe].contains(&(-x, -y)) {
+        if PIPE_DIR_MAP[pipe as usize].contains(&(-x, -y)) {
             start_dir = (*x, *y);
             break;
         }
@@ -100,7 +113,7 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
             break;
         }
         // get assoc. directions
-        let directions = &PIPE_DIR_MAP[pipe];
+        let directions = &PIPE_DIR_MAP[*pipe as usize];
 
         // Select the assoc. direction that is not the reverse of the current direction
         dir = if (-x, -y) == directions[0] {
@@ -159,7 +172,7 @@ fn crossed_boundary(left: u8, right: u8) -> bool {
     if left == b'|' {
         return true;
     }
-    PIPE_DIR_MAP[&left][0] != PIPE_DIR_MAP[&right][0]
+    PIPE_DIR_MAP[left as usize][0] != PIPE_DIR_MAP[right as usize][0]
 }
 
 /// Figure out which corner pipe segment should replace the start tile
@@ -173,6 +186,11 @@ fn replace_start(start_dir: (i32, i32), end_dir: (i32, i32)) -> u8 {
         _ => b'|',
     }
 }
+
+// pub fn process(input: &str) -> miette::Result<String, AocError> {
+    
+//     Ok("".to_string())
+// }
 
 #[cfg(test)]
 mod tests {
