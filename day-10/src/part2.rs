@@ -20,13 +20,13 @@ static PIPE_DIR_MAP: [[(i32, i32); 2]; 128] = create_pipe_dir_map();
 
 const fn create_pipe_dir_map() -> [[(i32, i32); 2]; 128] {
     let mut map = [[(0, 0), (0, 0)]; 128];
-    map[b'|' as usize] =  [UP,   DOWN];
-    map[b'-' as usize] =  [LEFT, RIGHT];
-    map[b'L' as usize] =  [UP,   RIGHT];
-    map[b'J' as usize] =  [UP,   LEFT];
-    map[b'7' as usize] =  [DOWN, LEFT];
-    map[b'F' as usize] =  [DOWN, RIGHT];
-    map[b'S' as usize] =  [DOWN, RIGHT];
+    map[b'|' as usize] = [UP, DOWN];
+    map[b'-' as usize] = [LEFT, RIGHT];
+    map[b'L' as usize] = [UP, RIGHT];
+    map[b'J' as usize] = [UP, LEFT];
+    map[b'7' as usize] = [DOWN, LEFT];
+    map[b'F' as usize] = [DOWN, RIGHT];
+    map[b'S' as usize] = [DOWN, RIGHT];
     map
 }
 
@@ -187,14 +187,177 @@ fn replace_start(start_dir: (i32, i32), end_dir: (i32, i32)) -> u8 {
     }
 }
 
-// pub fn process(input: &str) -> miette::Result<String, AocError> {
-    
-//     Ok("".to_string())
-// }
+/*
+^ 1100
+v 0000
+
+< 0100
+> 1000
+'|'
+0000 ^ 1100 = 1100
+0000 ^ 0000 = 0000
+'-'
+0000 ^ 0100 = 0100
+0000 ^ 1000 = 1000
+'L'
+1010 ^ 0010 = 1000
+1010 ^ 0100 = 1100
+'F'
+0100 ^ 0100 = 0000
+0100 ^ 1100 = 1000
+'J'
+0100 ^ 0000 = 0100
+0100 ^ 1000 = 1100
+'7'
+1000 ^ 1000 = 0000
+1000 ^ 1100 = 0100
+
+*/
+
+// The idea is to be able to get the next direction by doing a bitwise xor with the current tile
+// and previous direction.
+mod direction {
+    pub const N: u8 = 0b1100;
+    pub const S: u8 = 0b0000;
+    pub const W: u8 = 0b0100;
+    pub const E: u8 = 0b1000;
+}
+
+mod tile {
+    pub const NS: u8 = 0b0000; // b'|'
+    pub const EW: u8 = 0b0000; // b'-'
+    pub const NE: u8 = 0b1000; // b'L'
+    pub const NW: u8 = 0b0100; // b'J'
+    pub const SW: u8 = 0b1000; // b'7'
+    pub const SE: u8 = 0b0100; // b'F'
+}
+
+const MAP_LEN: usize = 128;
+static BIT_MAP: [u8; MAP_LEN] = create_bit_map();
+
+const fn create_bit_map() -> [u8; MAP_LEN] {
+    let mut bit_map = [0; MAP_LEN];
+    bit_map[b'|' as usize] = tile::NS;
+    bit_map[b'-' as usize] = tile::EW;
+    bit_map[b'L' as usize] = tile::NE;
+    bit_map[b'J' as usize] = tile::NW;
+    bit_map[b'7' as usize] = tile::SW;
+    bit_map[b'F' as usize] = tile::SE;
+    bit_map
+}
+
+/// Check east and west. If no match then it must be north and south
+fn get_start_direction(input: &[u8], start_index: usize) -> u8 {
+    // east
+    if let Some(c) = input.get(start_index + 1) {
+        if [b'-', b'J', b'7'].contains(c) {
+            return direction::E;
+        }
+    }
+    // west
+    if let Some(c) = input.get(start_index - 1) {
+        if [b'-', b'L', b'F'].contains(c) {
+            return direction::W;
+        }
+    }
+    direction::N
+}
+
+fn get_next_index(mut index: usize, dir: u8, row_length: usize) -> usize {
+    index -= (dir == direction::N) as usize * row_length;
+    index += (dir == direction::S) as usize * row_length;
+    index -= (dir == direction::W) as usize;
+    index += (dir == direction::E) as usize;
+    index
+}
+
+#[derive(Debug, Clone, Copy)]
+struct Vertex {
+    x: i32,
+    y: i32,
+}
+
+impl Vertex {
+    pub fn new(x: i32, y: i32) -> Vertex {
+        Vertex { x, y }
+    }
+}
+
+#[derive(Debug, Default)]
+struct Perimeter {
+    vertices: Vec<Vertex>,
+    perimeter_length: usize,
+    row_length: usize,
+}
+
+impl Perimeter {
+    pub fn save_vertex(&mut self, index: usize) {
+        self.vertices.push(Vertex::new(
+            (index % self.row_length) as i32,
+            (index / self.row_length) as i32,
+        ))
+    }
+}
+
+pub fn process_bits(input: &str) -> miette::Result<String, AocError> {
+    let mut index = input.find('S').unwrap();
+
+    let mut p = Perimeter {
+        row_length: input.find('\n').unwrap() + 1,
+        ..Default::default()
+    };
+    p.save_vertex(index);
+
+    let input = input.as_bytes();
+
+    let mut dir = get_start_direction(input, index);
+
+    // Traverse entire loop and save vertices
+    loop {
+        p.perimeter_length += 1;
+        index = get_next_index(index, dir, p.row_length);
+
+        let c = input[index];
+        match c {
+            b'S' => break,
+            b'L' | b'J' | b'7' | b'F' => p.save_vertex(index),
+            _ => (),
+        }
+        dir ^= BIT_MAP[c as usize]
+    }
+
+    // shoelace algorithm
+    p.vertices.push(p.vertices[0]);
+    let area: i32 = p
+        .vertices
+        .iter()
+        .zip(p.vertices.iter().skip(1))
+        .fold(0, |acc, (v1, v2)| acc + (v2.x + v1.x) * (v2.y - v1.y))
+        / 2;
+
+    // dbg!(p.perimeter_length, p.vertices, area);
+    // Pick's theorem
+    let result = i32::abs(area) as usize - p.perimeter_length / 2 + 1;
+
+    Ok(result.to_string())
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_process_0() -> miette::Result<()> {
+        let input = "\
+-L|F7
+7S-7|
+L|7||
+-L-J|
+L|-JF";
+        assert_eq!("1", process(input)?);
+        assert_eq!("1", process_bits(input)?);
+        Ok(())
+    }
 
     #[test]
     fn test_process1() -> miette::Result<()> {
@@ -209,6 +372,7 @@ mod tests {
 .L--J.L--J.
 ...........";
         assert_eq!("4", process(input1)?);
+        assert_eq!("4", process_bits(input1)?);
         Ok(())
     }
 
@@ -225,6 +389,7 @@ mod tests {
 .L--JL--J.
 ..........";
         assert_eq!("4", process(input2)?);
+        assert_eq!("4", process_bits(input2)?);
         Ok(())
     }
 
@@ -242,6 +407,7 @@ L--J.L7...LJS7F-7L7.
 ....FJL-7.||.||||...
 ....L---J.LJ.LJLJ...";
         assert_eq!("8", process(input3)?);
+        assert_eq!("8", process_bits(input3)?);
         Ok(())
     }
 
@@ -259,6 +425,7 @@ L---JF-JLJ.||-FJLJJ7
 L.L7LFJ|||||FJL7||LJ
 L7JLJL-JLJLJL--JLJ.L";
         assert_eq!("10", process(input4)?);
+        assert_eq!("10", process_bits(input4)?);
         Ok(())
     }
 }

@@ -28,3 +28,11 @@ fn part2() {
     )))
     .unwrap();
 }
+
+#[divan::bench]
+fn part2_bits() {
+    part2::process_bits(divan::black_box(include_str!(
+        "../input.txt",
+    )))
+    .unwrap();
+}
