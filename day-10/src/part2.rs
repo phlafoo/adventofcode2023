@@ -1,12 +1,7 @@
 use crate::custom_error::AocError;
-use phf::phf_map;
+// use phf::phf_map;
 
-const UP: (i32, i32) = (0, -1);
-const DOWN: (i32, i32) = (0, 1);
-const LEFT: (i32, i32) = (-1, 0);
-const RIGHT: (i32, i32) = (1, 0);
-
-// Associate pipes with directions
+// Associate pipes with directions (SLOW)
 // static PIPE_DIR_MAP: phf::Map<u8, [(i32, i32); 2]> = phf_map! {
 //     b'|' => [UP,   DOWN],
 //     b'-' => [LEFT, RIGHT],
@@ -16,6 +11,12 @@ const RIGHT: (i32, i32) = (1, 0);
 //     b'F' => [DOWN, RIGHT],
 //     b'S' => [DOWN, RIGHT],
 // };
+
+const UP: (i32, i32) = (0, -1);
+const DOWN: (i32, i32) = (0, 1);
+const LEFT: (i32, i32) = (-1, 0);
+const RIGHT: (i32, i32) = (1, 0);
+
 static PIPE_DIR_MAP: [[(i32, i32); 2]; 128] = create_pipe_dir_map();
 
 const fn create_pipe_dir_map() -> [[(i32, i32); 2]; 128] {
@@ -30,7 +31,7 @@ const fn create_pipe_dir_map() -> [[(i32, i32); 2]; 128] {
     map
 }
 
-/// I probably could have processed the input better to reduce the amount of conditional logic.
+/// See `process_bits` for fast version
 pub fn process(input: &str) -> miette::Result<String, AocError> {
     let row_length = (input.find('\n').unwrap() + 1) as i32;
     let start_index = input.find('S').unwrap() as i32;
@@ -233,17 +234,17 @@ mod tile {
 }
 
 const MAP_LEN: usize = 128;
-static BIT_MAP: [u8; MAP_LEN] = create_bit_map();
+static TILE_BYTE_MAP: [u8; MAP_LEN] = create_tile_byte_map();
 
-const fn create_bit_map() -> [u8; MAP_LEN] {
-    let mut bit_map = [0; MAP_LEN];
-    bit_map[b'|' as usize] = tile::NS;
-    bit_map[b'-' as usize] = tile::EW;
-    bit_map[b'L' as usize] = tile::NE;
-    bit_map[b'J' as usize] = tile::NW;
-    bit_map[b'7' as usize] = tile::SW;
-    bit_map[b'F' as usize] = tile::SE;
-    bit_map
+const fn create_tile_byte_map() -> [u8; MAP_LEN] {
+    let mut map = [0; MAP_LEN];
+    map[b'|' as usize] = tile::NS;
+    map[b'-' as usize] = tile::EW;
+    map[b'L' as usize] = tile::NE;
+    map[b'J' as usize] = tile::NW;
+    map[b'7' as usize] = tile::SW;
+    map[b'F' as usize] = tile::SE;
+    map
 }
 
 /// Check east and west. If no match then it must be north and south
@@ -271,73 +272,60 @@ fn get_next_index(mut index: usize, dir: u8, row_length: usize) -> usize {
     index
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy)]
 struct Vertex {
     x: i32,
     y: i32,
 }
 
 impl Vertex {
-    pub fn new(x: i32, y: i32) -> Vertex {
-        Vertex { x, y }
-    }
-}
-
-#[derive(Debug, Default)]
-struct Perimeter {
-    vertices: Vec<Vertex>,
-    perimeter_length: usize,
-    row_length: usize,
-}
-
-impl Perimeter {
-    pub fn save_vertex(&mut self, index: usize) {
-        self.vertices.push(Vertex::new(
-            (index % self.row_length) as i32,
-            (index / self.row_length) as i32,
-        ))
+    pub fn from_index(index: usize, row_length: usize) -> Vertex {
+        Vertex {
+            x: (index % row_length) as i32,
+            y: (index / row_length) as i32,
+        }
     }
 }
 
 pub fn process_bits(input: &str) -> miette::Result<String, AocError> {
     let mut index = input.find('S').unwrap();
+    let row_length = input.find('\n').unwrap() + 1;
 
-    let mut p = Perimeter {
-        row_length: input.find('\n').unwrap() + 1,
-        ..Default::default()
-    };
-    p.save_vertex(index);
-
+    // as bytes makes indexing simpler
     let input = input.as_bytes();
 
+    // Get start direction and vertex
     let mut dir = get_start_direction(input, index);
+    let mut curr_vertex = Vertex::from_index(index, row_length);
+    let mut prev_vertex;
 
-    // Traverse entire loop and save vertices
+    let mut perimeter_length = 0;
+    let mut area = 0;
+
+    // Traverse entire cycle path and apply shoelace algorithm
     loop {
-        p.perimeter_length += 1;
-        index = get_next_index(index, dir, p.row_length);
+        perimeter_length += 1;
+        index = get_next_index(index, dir, row_length);
 
-        let c = input[index];
-        match c {
-            b'S' => break,
-            b'L' | b'J' | b'7' | b'F' => p.save_vertex(index),
-            _ => (),
+        let tile = input[index];
+        match tile {
+            b'L' | b'J' | b'7' | b'F' | b'S' => {
+                // Update area when we find a vertex
+                prev_vertex = curr_vertex;
+                curr_vertex = Vertex::from_index(index, row_length);
+                area += (curr_vertex.x + prev_vertex.x) * (curr_vertex.y - prev_vertex.y);
+
+                if tile == b'S'{
+                    area /= 2;
+                    break;
+                }
+            },
+            _ => ()
         }
-        dir ^= BIT_MAP[c as usize]
+        dir ^= TILE_BYTE_MAP[tile as usize]
     }
-
-    // shoelace algorithm
-    p.vertices.push(p.vertices[0]);
-    let area: i32 = p
-        .vertices
-        .iter()
-        .zip(p.vertices.iter().skip(1))
-        .fold(0, |acc, (v1, v2)| acc + (v2.x + v1.x) * (v2.y - v1.y))
-        / 2;
-
-    // dbg!(p.perimeter_length, p.vertices, area);
-    // Pick's theorem
-    let result = i32::abs(area) as usize - p.perimeter_length / 2 + 1;
+    // use Pick's theorem to get number of tiles inside
+    let result = i32::abs(area) as usize - perimeter_length / 2 + 1;
 
     Ok(result.to_string())
 }
