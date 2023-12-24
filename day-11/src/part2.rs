@@ -86,7 +86,7 @@ mod tests {
 ..........
 .......#..
 #...#.....";
-        assert_eq!("374", process(input)?);
+        assert_eq!("82000210", process(input)?);
         Ok(())
     }
 }
