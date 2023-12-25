@@ -69,6 +69,54 @@ pub fn process(input: &str) -> miette::Result<String, AocError> {
     Ok(result.to_string())
 }
 
+// See part 1 for explanation
+pub fn process_fastest(input: &str) -> miette::Result<String, AocError> {
+    // dim => dimension aka side length (assume square grid).
+    // padding is the number of characters used for new line
+    //   with windows it is 1 ("\n") (my test input)
+    //   with linux it is 2 ("\r\n") (actual input)
+    let (dim, padding) = match input.find('\r') {
+        Some(i) => (i, 2),
+        None => (input.find('\n').unwrap(), 1)
+    };
+    // dbg!(input.len(), dim, padding);
+
+    let input = input.as_bytes();
+
+    let mut galaxies_x = vec![0; dim];
+    let mut galaxies_y = vec![0; dim];
+    let mut total_galaxies = 0;
+
+    for (index, c) in input.iter().enumerate() {
+        if *c == b'#' {
+            total_galaxies += 1;
+            let v = Vertex::from_index(index, dim + padding);
+            galaxies_x[v.x as usize] += 1;
+            galaxies_y[v.y as usize] += 1;
+        }
+    }
+
+    let x_dist = sum_diff_all_pairs(&galaxies_x, total_galaxies);
+    let y_dist = sum_diff_all_pairs(&galaxies_y, total_galaxies);
+    let result = x_dist + y_dist;
+
+    Ok(result.to_string())
+}
+
+fn sum_diff_all_pairs(galaxy_coords: &[usize], total_galaxies: usize) -> i128 {
+    let mut expansion = 0;
+    let mut curr_galaxy = 0;
+
+    galaxy_coords.iter().enumerate().fold(0, |acc, (i, &c)| {
+        let f = c as i128 * (c as i128 + 2 * curr_galaxy - total_galaxies as i128);
+
+        curr_galaxy += c as i128;
+        expansion += (c == 0) as i128 * 999_999;
+        
+        acc + f * (i as i128 + expansion)
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -86,7 +134,8 @@ mod tests {
 ..........
 .......#..
 #...#.....";
-        assert_eq!("82000210", process(input)?);
+        // assert_eq!("82000210", process(input)?);
+        assert_eq!("82000210", process_fastest(input)?);
         Ok(())
     }
 }

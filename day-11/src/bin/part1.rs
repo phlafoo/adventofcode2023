@@ -11,7 +11,7 @@ fn main() -> miette::Result<()> {
 
     let file = include_str!("../../input.txt");
     // let result = process(file).context("process part 1")?;
-    let result = process_linear(file).context("process part 1")?;
+    let result = process_fastest(file).context("process part 1")?;
     // 9214785
     println!("{}", result);
     Ok(())
