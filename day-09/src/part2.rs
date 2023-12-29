@@ -1,5 +1,3 @@
-use num::integer::Roots;
-
 use crate::custom_error::AocError;
 
 pub fn process(input: &str) -> miette::Result<String, AocError> {
