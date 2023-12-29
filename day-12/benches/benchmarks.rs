@@ -6,6 +6,14 @@ fn main() {
 }
 
 #[divan::bench]
+fn part1_naive() {
+    part1::process_naive(divan::black_box(include_str!(
+        "../input.txt",
+    )))
+    .unwrap();
+}
+
+#[divan::bench(sample_size = 10, sample_count = 100)]
 fn part1() {
     part1::process(divan::black_box(include_str!(
         "../input.txt",
