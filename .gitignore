@@ -4,3 +4,4 @@ dhat-heap.json
 scratch.txt
 /benchmark-results
 /optick
+/day-*/input*
