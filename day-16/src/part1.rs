@@ -2,10 +2,10 @@ use crate::custom_error::AocError;
 
 #[derive(Debug, Clone, Copy)]
 enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
+    Up = 0b1000,
+    Down = 0b0100,
+    Left = 0b0010,
+    Right = 0b0001,
 }
 
 use Direction::*;
@@ -26,7 +26,7 @@ struct BeamMap<'a> {
     grid: &'a [u8],
     width: usize,
     photons: Vec<Photon>,
-    energized: Vec<[bool; 4]>,
+    energized: Vec<u8>,
 }
 
 impl<'a> BeamMap<'a> {
@@ -37,24 +37,23 @@ impl<'a> BeamMap<'a> {
                 continue;
             }
             match self.energized[i] {
-                [false, false, false, false] => print!("."),
-                [true, false, false, false] => print!("▲"),
-                [false, true, false, false] => print!("▼"),
-                [false, false, true, false] => print!("◄"),
-                [false, false, false, true] => print!("►"),
+                0 => print!("."),
+                0b1000 => print!("▲"),
+                0b0100 => print!("▼"),
+                0b0010 => print!("◄"),
+                0b0001 => print!("►"),
                 mask => {
-                    let count = mask.iter().filter(|&&b| b).count();
-                    print!("{count}");
+                    print!("{}", mask.count_ones());
                 }
             }
         }
         println!();
     }
 
-    pub fn get_energized_count(&self) -> usize {
+    pub fn get_energized_count(&self) -> u32 {
         self.energized
             .iter()
-            .fold(0, |acc, e| if e.contains(&true) { acc + 1 } else { acc })
+            .fold(0, |acc, &e| acc + (e != 0) as u32)
     }
 
     pub fn init(grid: &'a [u8]) -> BeamMap<'a> {
@@ -72,13 +71,9 @@ impl<'a> BeamMap<'a> {
 
     /// Returns false if direction was already set
     fn set_direction_at(&mut self, dir: Direction, index: usize) -> bool {
-        let has_dir = &mut self.energized[index][dir as usize];
-        if *has_dir {
-            false
-        } else {
-            *has_dir = true;
-            true
-        }
+        let before = self.energized[index];
+        self.energized[index] |= dir as u8;
+        before != self.energized[index]
     }
 
     /// Get next direction based on current tile and direction. Also adds photon if split
@@ -186,6 +181,7 @@ impl<'a> BeamMap<'a> {
 
             // Cache direction at this tile
             if !self.set_direction_at(p.direction, p.index) {
+                // Remove if already set
                 self.photons.remove(photon_index);
                 continue;
             }
