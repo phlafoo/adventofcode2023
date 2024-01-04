@@ -30,6 +30,18 @@ struct BeamMap<'a> {
 }
 
 impl<'a> BeamMap<'a> {
+    pub fn init(grid: &'a [u8]) -> BeamMap<'a> {
+        let energized = vec![0; grid.len()];
+        let width = grid.iter().position(|&t| t == b'\n').unwrap();
+
+        BeamMap {
+            grid,
+            width,
+            photons: vec![Photon::new(0, Right)],
+            energized,
+        }
+    }
+
     pub fn print_grid(&self) {
         for i in 0..self.energized.len() {
             if self.grid[i] != b'.' {
@@ -56,18 +68,6 @@ impl<'a> BeamMap<'a> {
             .fold(0, |acc, &e| acc + (e != 0) as u32)
     }
 
-    pub fn init(grid: &'a [u8]) -> BeamMap<'a> {
-        // [up, down, left, right]
-        let energized = vec![Default::default(); grid.len()];
-        let width = grid.iter().position(|&t| t == b'\n').unwrap();
-
-        BeamMap {
-            grid,
-            width,
-            photons: vec![Photon::new(0, Right)],
-            energized,
-        }
-    }
 
     /// Returns false if direction was already set
     fn set_direction_at(&mut self, dir: Direction, index: usize) -> bool {
