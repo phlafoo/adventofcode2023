@@ -47,6 +47,7 @@ impl<'a> BeamMap<'a> {
         self.photons = vec![start];
     }
 
+    #[allow(dead_code)]
     pub fn print_grid(&self) {
         for i in 0..self.energized.len() {
             if self.grid[i] != b'.' {
